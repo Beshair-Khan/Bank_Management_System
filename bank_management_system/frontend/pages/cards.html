@@ -8,132 +8,352 @@
 </head>
 <body>
 
-  <div class="sidebar">
-  <div class="logo">🏦 <span>BankMS</span></div>
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <a href="index.html">Dashboard</a>
-  <a href="customers.html">Customers</a>
-  <a href="accounts.html">Accounts</a>
-  <a href="transactions.html">Transactions</a>
-  <a href="loans.html">Loans</a>
-  <a href="cards.html" class="active">Cards</a>
-</div>
+  <!--Sidebar-->
+  <nav class="sidebar" id="sidebar">
+    <div class="logo">
+      <span>SMIU BankMS</span>
 
+      <button class="sidebar-close"
+              onclick="closeSidebar()"
+              aria-label="Close menu">
+        &#x2715;
+      </button>
+    </div>
+
+    <span class="nav-label">Main</span>
+
+    <a href="index.html">&nbsp; Dashboard</a>
+    <a href="customers.html">&nbsp; Customers</a>
+    <a href="accounts.html">&nbsp; Accounts</a>
+    <a href="transactions.html">&nbsp; Transactions</a>
+
+    <span class="nav-label">Services</span>
+
+    <a href="loans.html">&nbsp; Loans</a>
+    <a href="cards.html" class="active">&nbsp; Cards</a>
+  </nav>
+
+  <!--Topbar-->
+  <header class="topbar">
+
+    <button class="hamburger"
+            onclick="openSidebar()"
+            aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="topbar-title">
+      <span>SMIU BankMS</span>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="topbar-icon"></div>
+      <div class="topbar-icon"></div>
+    </div>
+
+  </header>
+
+  <!-- Main Content -->
   <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-      <div class="page-title" style="margin-bottom:0">Cards</div>
+
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Cards</div>
+        <p class="page-subtitle">
+          Manage debit and credit cards
+        </p>
+      </div>
     </div>
 
     <!-- Summary Cards -->
-    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="stat-card blue">
+    <div class="stats-grid">
+
+      <div class="stat-card">
         <div class="label">Total Cards</div>
         <div class="value" id="totalCards">...</div>
         <div class="sub">All cards</div>
       </div>
-      <div class="stat-card green">
+
+      <div class="stat-card">
         <div class="label">Active Cards</div>
         <div class="value" id="activeCards">...</div>
         <div class="sub">Currently active</div>
       </div>
-      <div class="stat-card orange">
+
+      <div class="stat-card">
         <div class="label">Blocked Cards</div>
         <div class="value" id="blockedCards">...</div>
         <div class="sub">Blocked by customer</div>
       </div>
+
     </div>
 
+    <!-- Table -->
     <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Customer</th>
-            <th>Card Number</th>
-            <th>Type</th>
-            <th>Network</th>
-            <th>Credit Limit</th>
-            <th>Expiry</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="cardsTable">
-          <tr><td colspan="9" class="loading">Loading...</td></tr>
-        </tbody>
-      </table>
+
+      <div class="table-scroll">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Card Number</th>
+              <th>Type</th>
+              <th>Network</th>
+              <th>Credit Limit</th>
+              <th>Expiry</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody id="cardsTable">
+            <tr>
+              <td colspan="9" class="loading">
+                Loading...
+              </td>
+            </tr>
+          </tbody>
+
+        </table>
+
+      </div>
+
     </div>
+
   </div>
 
-  <script type="module">
-    import { getCards } from '../js/api.js';
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
-    const BASE_URL = 'https://ideal-waffle-69566r5qqq9wfr5rw-3000.app.github.dev/api';
-
-    async function loadCards() {
-      const res = await getCards();
-      const tbody = document.getElementById('cardsTable');
-
-      if (!res.data || res.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="loading">No cards found</td></tr>`;
-        return;
-      }
-
-      // ── Summary Stats ──
-      const total   = res.data.length;
-      const active  = res.data.filter(c => c.status === 'Active').length;
-      const blocked = res.data.filter(c => c.status === 'Blocked').length;
-
-      document.getElementById('totalCards').textContent   = total;
-      document.getElementById('activeCards').textContent  = active;
-      document.getElementById('blockedCards').textContent = blocked;
-
-      // ── Table ──
-      tbody.innerHTML = res.data.map(c => `
-        <tr>
-          <td>${c.card_id}</td>
-          <td>${c.first_name} ${c.last_name}</td>
-          <td>${c.card_number}</td>
-          <td>${c.card_type}</td>
-          <td>${c.card_network}</td>
-          <td>${c.credit_limit ? 'PKR ' + Number(c.credit_limit).toLocaleString() : '—'}</td>
-          <td>${new Date(c.expiry_date).toLocaleDateString()}</td>
-          <td><span class="badge ${c.status.toLowerCase()}">${c.status}</span></td>
-          <td>
-            ${c.status === 'Active'
-              ? `<button class="btn btn-danger" onclick="blockCard(${c.card_id})">Block</button>`
-              : `<button class="btn btn-success" onclick="unblockCard(${c.card_id})">Unblock</button>`
-            }
-          </td>
-        </tr>
-      `).join('');
+  <!-- Sidebar + Toast Helpers -->
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
     }
 
-    // ── Block Card ──
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeSidebar();
+    });
+
+    document.querySelectorAll('.sidebar a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.innerWidth <= 680) closeSidebar();
+      });
+    });
+
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+
+      t.textContent = msg;
+      t.className = 'toast show ' + type;
+
+      setTimeout(() => {
+        t.className = 'toast';
+      }, 3000);
+    };
+  </script>
+
+  <!-- Data Logic -->
+  <script type="module">
+
+    import { getCards } from '../js/api.js';
+
+    const BASE_URL =
+      'https://ideal-waffle-69566r5qqq9wfr5rw-3000.app.github.dev/api';
+
+    async function loadCards() {
+
+      const tbody = document.getElementById('cardsTable');
+
+      try {
+
+        const res = await getCards();
+
+        if (!res.data || res.data.length === 0) {
+
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="9" class="loading">
+                No cards found
+              </td>
+            </tr>
+          `;
+
+          return;
+        }
+
+        //Summary Stats
+
+        const total = res.data.length;
+
+        const active = res.data.filter(
+          c => c.status === 'Active'
+        ).length;
+
+        const blocked = res.data.filter(
+          c => c.status === 'Blocked'
+        ).length;
+
+        document.getElementById('totalCards').textContent = total;
+
+        document.getElementById('activeCards').textContent = active;
+
+        document.getElementById('blockedCards').textContent = blocked;
+
+        //Table
+        tbody.innerHTML = res.data.map(c => `
+
+          <tr>
+
+            <td>${c.card_id}</td>
+
+            <td>
+              ${c.first_name} ${c.last_name}
+            </td>
+
+            <td>${c.card_number}</td>
+
+            <td>${c.card_type}</td>
+
+            <td>${c.card_network}</td>
+
+            <td>
+              ${c.credit_limit
+                ? 'PKR ' + Number(c.credit_limit).toLocaleString()
+                : '—'}
+            </td>
+
+            <td>
+              ${new Date(c.expiry_date).toLocaleDateString()}
+            </td>
+
+            <td>
+              <span class="badge ${c.status.toLowerCase()}">
+                ${c.status}
+              </span>
+            </td>
+
+            <td>
+
+              ${c.status === 'Active'
+
+                ? `
+                  <button
+                    class="btn btn-sm"
+                    style="background:#f8d7da;color:#721c24;"
+                    onclick="blockCard(${c.card_id})">
+                    Block
+                  </button>
+                `
+
+                : `
+                  <button
+                    class="btn btn-sm"
+                    onclick="unblockCard(${c.card_id})">
+                    Unblock
+                  </button>
+                `
+              }
+
+            </td>
+
+          </tr>
+
+        `).join('');
+
+      } catch (err) {
+
+        console.error('loadCards error:', err);
+
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="loading">
+              Failed to load cards.
+            </td>
+          </tr>
+        `;
+
+        showToast('Could not load cards.', 'error');
+      }
+    }
+
+    //Block Card
     window.blockCard = async function(id) {
-      if (confirm('Block this card?')) {
+
+      if (!confirm('Block this card?')) return;
+
+      try {
+
         await fetch(`${BASE_URL}/cards/${id}/status`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'Blocked' })
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            status: 'Blocked'
+          })
         });
+
+        showToast('Card blocked.', 'success');
+
         loadCards();
+
+      } catch (err) {
+
+        console.error(err);
+
+        showToast('Failed to block card.', 'error');
       }
     };
 
     // ── Unblock Card ──
     window.unblockCard = async function(id) {
-      if (confirm('Unblock this card?')) {
+
+      if (!confirm('Unblock this card?')) return;
+
+      try {
+
         await fetch(`${BASE_URL}/cards/${id}/status`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'Active' })
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            status: 'Active'
+          })
         });
+
+        showToast('Card unblocked.', 'success');
+
         loadCards();
+
+      } catch (err) {
+
+        console.error(err);
+
+        showToast('Failed to unblock card.', 'error');
       }
     };
 
     loadCards();
+
   </script>
 
 </body>

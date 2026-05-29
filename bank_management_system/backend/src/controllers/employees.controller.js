@@ -18,45 +18,6 @@ const getAllEmployees = async (req, res, next) => {
   }
 };
 
-// GET single employee
-const getEmployeeById = async (req, res, next) => {
-  try {
-    const result = await pool.query(
-      `SELECT e.*, 
-              b.branch_name, b.city,
-              d.dept_name
-       FROM employees e
-       JOIN branches b    ON e.branch_id = b.branch_id
-       JOIN departments d ON e.dept_id   = d.dept_id
-       WHERE e.employee_id = $1`,
-      [req.params.id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Employee not found' });
-    }
-    res.json({ success: true, data: result.rows[0] });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// GET employees by branch
-const getEmployeesByBranch = async (req, res, next) => {
-  try {
-    const result = await pool.query(
-      `SELECT e.*, d.dept_name
-       FROM employees e
-       JOIN departments d ON e.dept_id = d.dept_id
-       WHERE e.branch_id = $1
-       ORDER BY e.employee_id`,
-      [req.params.id]
-    );
-    res.json({ success: true, count: result.rows.length, data: result.rows });
-  } catch (err) {
-    next(err);
-  }
-};
-
 // POST create new employee
 const createEmployee = async (req, res, next) => {
   try {
@@ -109,8 +70,6 @@ const deleteEmployee = async (req, res, next) => {
 
 module.exports = {
   getAllEmployees,
-  getEmployeeById,
-  getEmployeesByBranch,
   createEmployee,
   updateEmployee,
   deleteEmployee

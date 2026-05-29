@@ -8,112 +8,191 @@
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="logo">🏦 <span>BankMS</span></div>
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-    <a href="index.html">Dashboard</a>
-    <a href="customers.html" class="active">Customers</a>
-    <a href="accounts.html">Accounts</a>
-    <a href="transactions.html">Transactions</a>
-    <a href="loans.html">Loans</a>
-    <a href="cards.html">Cards</a>
-  </div>
+  <!--Sidebar-->
+  <nav class="sidebar" id="sidebar">
+    <div class="logo">
+      <span>SMIU BankMS</span>
+      <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">&#x2715;</button>
+    </div>
 
+    <span class="nav-label">Main</span>
+    <a href="index.html">&nbsp; Dashboard</a>
+    <a href="customers.html" class="active">&nbsp; Customers</a>
+    <a href="accounts.html">&nbsp; Accounts</a>
+    <a href="transactions.html">&nbsp; Transactions</a>
+
+    <span class="nav-label">Services</span>
+    <a href="loans.html">&nbsp; Loans</a>
+    <a href="cards.html">&nbsp; Cards</a>
+  </nav>
+
+  <!-- Topbar (mobile only) -->
+  <header class="topbar">
+    <button class="hamburger" onclick="openSidebar()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="topbar-title"> <span>SMIU BankMS</span></div>
+    <div class="topbar-actions">
+      <div class="topbar-icon"></div>
+      <div class="topbar-icon"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
   <div class="container">
 
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-      <div class="page-title" style="margin-bottom:0">Customers</div>
-      <button class="btn btn-primary" onclick="openAddModal()">+ Add Customer</button>
+    <div class="page-header">
+      <div>
+        <div class="page-title">Customers</div>
+        <p class="page-subtitle">Manage all registered bank customers</p>
+      </div>
+      <button class="btn" onclick="openAddModal()">+ Add Customer</button>
     </div>
 
     <!-- Table -->
     <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>City</th>
-            <th>Join Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody id="customersTable">
-          <tr><td colspan="8" class="loading">Loading...</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>City</th>
+              <th>Join Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="customersTable">
+            <tr><td colspan="8" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+
   </div>
 
-  <!-- MODAL (ONLY ONE - FIXED) -->
+  <!-- MODAL — Add / Edit Customer -->
   <div id="modalOverlay" class="modal-overlay">
     <div class="modal">
 
       <h2 id="modalTitle">Add Customer</h2>
 
-      <div class="form-group">
-        <label>First Name</label>
-        <input id="firstName" type="text"/>
-      </div>
+      <!-- Error banner (hidden by default) -->
+      <div id="formError" style="
+        display:none;
+        background:#ffe5e5;
+        color:#c1121f;
+        padding:10px 14px;
+        border-radius:8px;
+        font-size:13px;
+        margin-bottom:12px;
+        border:1px solid #ffd6d6;
+      "></div>
 
-      <div class="form-group">
-        <label>Last Name</label>
-        <input id="lastName" type="text"/>
-      </div>
+      <!-- Two-column grid form -->
+      <div class="modal-form-grid">
 
-      <div class="form-group">
-        <label>Email</label>
-        <input id="email" type="email"/>
-      </div>
+        <div>
+          <label for="firstName">First Name <span style="color:#c1121f">*</span></label>
+          <input id="firstName" type="text" placeholder="e.g. Ayesha"/>
+        </div>
 
-      <div class="form-group">
-        <label>Phone</label>
-        <input id="phone" type="text"/>
-      </div>
+        <div>
+          <label for="lastName">Last Name <span style="color:#c1121f">*</span></label>
+          <input id="lastName" type="text" placeholder="e.g. Khan"/>
+        </div>
 
-      <div class="form-group">
-        <label>CNIC</label>
-        <input id="cnic" type="text"/>
-      </div>
+        <div>
+          <label for="email">Email <span style="color:#c1121f">*</span></label>
+          <input id="email" type="email" placeholder="ayesha@email.com"/>
+        </div>
 
-      <div class="form-group">
-        <label>Date of Birth</label>
-        <input id="dob" type="date"/>
-      </div>
+        <div>
+          <label for="phone">Phone <span style="color:#c1121f">*</span></label>
+          <input id="phone" type="tel" placeholder="+92 300 0000000"/>
+        </div>
 
-      <div class="form-group">
-        <label>Address</label>
-        <input id="address" type="text"/>
-      </div>
+        <div>
+          <label for="cnic">CNIC</label>
+          <input id="cnic" type="text" placeholder="42101-1234567-1"/>
+        </div>
 
-      <div class="form-group">
-        <label>City</label>
-        <input id="city" type="text"/>
-      </div>
+        <div>
+          <label for="dob">Date of Birth</label>
+          <input id="dob" type="date"/>
+        </div>
 
-      <div class="form-group" id="statusGroup" style="display:none;">
-        <label>Status</label>
-        <select id="status">
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="Blocked">Blocked</option>
-        </select>
-      </div>
+        <div class="full-col">
+          <label for="address">Address</label>
+          <input id="address" type="text" placeholder="Street, Area"/>
+        </div>
+
+        <div>
+          <label for="city">City</label>
+          <input id="city" type="text" placeholder="e.g. Karachi"/>
+        </div>
+
+        <!-- Status: visible only in Edit mode -->
+        <div id="statusGroup" style="display:none;">
+          <label for="status">Status</label>
+          <select id="status">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="Blocked">Blocked</option>
+          </select>
+        </div>
+
+      </div><!-- /modal-form-grid -->
 
       <div class="modal-actions">
-        <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveCustomer()">Save</button>
+        <button class="btn cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="saveBtn" onclick="saveCustomer()">
+          Save Customer
+        </button>
       </div>
 
     </div>
   </div>
 
-  <!-- SCRIPT -->
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- SCRIPTS -->
+
+  <!-- Sidebar / toast helpers -->
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeSidebar(); closeModal(); } });
+
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + type;
+      setTimeout(() => { t.className = 'toast'; }, 3000);
+    };
+
+    // Close modal on backdrop click
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+  </script>
+
+  <!-- Data logic (module) -->
   <script type="module">
     import {
       getCustomers,
@@ -125,109 +204,178 @@
 
     let editingId = null;
 
-    // LOAD CUSTOMERS
+    // LOAD TABLE
     async function loadCustomers() {
-      const res = await getCustomers();
       const tbody = document.getElementById('customersTable');
+      tbody.innerHTML = `<tr><td colspan="8" class="loading">Loading...</td></tr>`;
 
-      if (!res.data || res.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="loading">No customers found</td></tr>`;
+      try {
+        const res = await getCustomers();
+
+        if (!res.data || res.data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" class="loading">No customers found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = res.data.map(c => `
+          <tr>
+            <td>${c.customer_id}</td>
+            <td>${c.first_name} ${c.last_name}</td>
+            <td>${c.email}</td>
+            <td>${c.phone}</td>
+            <td>${c.city}</td>
+            <td>${new Date(c.join_date).toLocaleDateString()}</td>
+            <td><span class="badge ${c.status.toLowerCase()}">${c.status}</span></td>
+            <td style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-sm btn-outline" onclick="openEditModal(${c.customer_id})">✏️ Edit</button>
+              <button class="btn btn-sm" style="background:#f8d7da;color:#721c24;" onclick="removeCustomer(${c.customer_id})">🗑 Delete</button>
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        console.error('loadCustomers error:', err);
+        tbody.innerHTML = `<tr><td colspan="8" class="loading">Failed to load customers.</td></tr>`;
+        window.showToast('Could not load customers.', 'error');
+      }
+    }
+
+    // OPEN ADD MODAL
+    window.openAddModal = function () {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = 'Add Customer';
+      document.getElementById('statusGroup').style.display = 'none';
+      document.getElementById('formError').style.display = 'none';
+      document.getElementById('saveBtn').textContent = 'Save Customer';
+      clearForm();
+      document.getElementById('modalOverlay').classList.add('open');
+      document.getElementById('firstName').focus();
+    };
+    // OPEN EDIT MODAL
+    window.openEditModal = async function (id) {
+      editingId = id;
+      document.getElementById('modalTitle').textContent = 'Edit Customer';
+      document.getElementById('statusGroup').style.display = 'block';
+      document.getElementById('formError').style.display = 'none';
+      document.getElementById('saveBtn').textContent = 'Update Customer';
+      clearForm();
+      document.getElementById('modalOverlay').classList.add('open');
+
+      try {
+        const data = await getCustomerById(id);
+        const c = data.data;
+
+        document.getElementById('firstName').value = c.first_name   || '';
+        document.getElementById('lastName').value  = c.last_name    || '';
+        document.getElementById('email').value     = c.email        || '';
+        document.getElementById('phone').value     = c.phone        || '';
+        document.getElementById('cnic').value      = c.cnic         || '';
+        document.getElementById('dob').value       = c.date_of_birth ? c.date_of_birth.split('T')[0] : '';
+        document.getElementById('address').value   = c.address      || '';
+        document.getElementById('city').value      = c.city         || '';
+        document.getElementById('status').value    = c.status       || 'Active';
+
+      } catch (err) {
+        console.error('openEditModal error:', err);
+        showFormError('Could not load customer data. Try again.');
+      }
+    };
+    // SAVE (ADD or EDIT)
+    window.saveCustomer = async function () {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const phone     = document.getElementById('phone').value.trim();
+
+      //Client-side validation
+      if (!firstName || !lastName) {
+        showFormError('First name and last name are required.');
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        showFormError('Please enter a valid email address.');
+        return;
+      }
+      if (!phone) {
+        showFormError('Phone number is required.');
         return;
       }
 
-      tbody.innerHTML = res.data.map(c => `
-        <tr>
-          <td>${c.customer_id}</td>
-          <td>${c.first_name} ${c.last_name}</td>
-          <td>${c.email}</td>
-          <td>${c.phone}</td>
-          <td>${c.city}</td>
-          <td>${new Date(c.join_date).toLocaleDateString()}</td>
-          <td><span class="badge ${c.status.toLowerCase()}">${c.status}</span></td>
-          <td style="display:flex; gap:8px;">
-            <button class="btn btn-warning" onclick="openEditModal(${c.customer_id})">Edit</button>
-            <button class="btn btn-danger" onclick="removeCustomer(${c.customer_id})">Delete</button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    // OPEN ADD
-    window.openAddModal = function () {
-      editingId = null;
-      document.getElementById('modalTitle').textContent = "Add Customer";
-      document.getElementById('statusGroup').style.display = "none";
-      clearForm();
-      document.getElementById('modalOverlay').classList.add('open');
-    };
-
-    // OPEN EDIT
-    window.openEditModal = async function (id) {
-      editingId = id;
-
-      document.getElementById('modalTitle').textContent = "Edit Customer";
-      document.getElementById('statusGroup').style.display = "block";
-
-      const data = await getCustomerById(id);
-      const c = data.data;
-
-      document.getElementById('firstName').value = c.first_name;
-      document.getElementById('lastName').value = c.last_name;
-      document.getElementById('email').value = c.email;
-      document.getElementById('phone').value = c.phone;
-      document.getElementById('cnic').value = c.cnic;
-      document.getElementById('dob').value = c.date_of_birth?.split('T')[0];
-      document.getElementById('address').value = c.address;
-      document.getElementById('city').value = c.city;
-      document.getElementById('status').value = c.status;
-
-      document.getElementById('modalOverlay').classList.add('open');
-    };
-
-    // SAVE
-    window.saveCustomer = async function () {
-      const data = {
-        first_name: document.getElementById('firstName').value,
-        last_name: document.getElementById('lastName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        cnic: document.getElementById('cnic').value,
-        date_of_birth: document.getElementById('dob').value,
-        address: document.getElementById('address').value,
-        city: document.getElementById('city').value,
-        status: document.getElementById('status').value || "Active"
+      //Build payload
+      const payload = {
+        first_name:    firstName,
+        last_name:     lastName,
+        email:         email,
+        phone:         phone,
+        cnic:          document.getElementById('cnic').value.trim(),
+        date_of_birth: document.getElementById('dob').value || null,
+        address:       document.getElementById('address').value.trim(),
+        city:          document.getElementById('city').value.trim(),
+        // For new customers always send "Active"; for edits use the dropdown
+        status: editingId
+          ? document.getElementById('status').value
+          : 'Active'
       };
 
-      if (editingId) {
-        await updateCustomer(editingId, data);
-      } else {
-        await createCustomer(data);
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+
+      try {
+        if (editingId) {
+          await updateCustomer(editingId, payload);
+          window.showToast('Customer updated successfully!', 'success');
+        } else {
+          await createCustomer(payload);
+          window.showToast('Customer added successfully!', 'success');
+        }
+
+        closeModal();
+        await loadCustomers(); // refresh table AFTER save confirms
+
+      } catch (err) {
+        console.error('saveCustomer error:', err);
+        showFormError('Save failed: ' + (err.message || 'Unknown error. Check the console.'));
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = editingId ? 'Update Customer' : 'Save Customer';
       }
-
-      closeModal();
-      loadCustomers();
     };
-
     // DELETE
     window.removeCustomer = async function (id) {
-      if (confirm("Are you sure?")) {
+      if (!confirm('Delete this customer? This cannot be undone.')) return;
+
+      try {
         await deleteCustomer(id);
-        loadCustomers();
+        window.showToast('Customer deleted.', 'success');
+        await loadCustomers();
+      } catch (err) {
+        console.error('deleteCustomer error:', err);
+        window.showToast('Delete failed: ' + (err.message || 'Unknown error.'), 'error');
       }
     };
-
-    // CLOSE MODAL
+    // HELPERS
     window.closeModal = function () {
       document.getElementById('modalOverlay').classList.remove('open');
+      document.getElementById('formError').style.display = 'none';
       clearForm();
+      editingId = null;
     };
 
     function clearForm() {
-      ["firstName","lastName","email","phone","cnic","dob","address","city"].forEach(id => {
-        document.getElementById(id).value = "";
+      ['firstName','lastName','email','phone','cnic','dob','address','city'].forEach(id => {
+        document.getElementById(id).value = '';
       });
+      document.getElementById('status').value = 'Active';
     }
 
+    function showFormError(msg) {
+      const el = document.getElementById('formError');
+      el.textContent = msg;
+      el.style.display = 'block';
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    // INIT
     loadCustomers();
   </script>
 

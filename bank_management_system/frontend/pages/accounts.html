@@ -8,65 +8,165 @@
 </head>
 <body>
 
-  <div class="sidebar">
-  <div class="logo">🏦 <span>BankMS</span></div>
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <a href="index.html">Dashboard</a>
-  <a href="customers.html">Customers</a>
-  <a href="accounts.html" class="active">Accounts</a>
-  <a href="transactions.html">Transactions</a>
-  <a href="loans.html">Loans</a>
-  <a href="cards.html">Cards</a>
-</div>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="logo">
+      <span>SMIU BankMS</span>
+      <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">&#x2715;</button>
+    </div>
 
+    <span class="nav-label">Main</span>
+    <a href="index.html">&nbsp; Dashboard</a>
+    <a href="customers.html">&nbsp; Customers</a>
+    <a href="accounts.html" class="active">&nbsp; Accounts</a>
+    <a href="transactions.html">&nbsp; Transactions</a>
+
+    <span class="nav-label">Services</span>
+    <a href="loans.html">&nbsp; Loans</a>
+    <a href="cards.html">&nbsp; Cards</a>
+  </nav>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <button class="hamburger" onclick="openSidebar()" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <div class="topbar-title">
+      <span>SMIU BankMS</span>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="topbar-icon"></div>
+      <div class="topbar-icon"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
   <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-      <div class="page-title" style="margin-bottom:0">Accounts</div>
+
+    <div class="page-header">
+      <div>
+        <div class="page-title">Accounts</div>
+        <p class="page-subtitle">Manage customer bank accounts</p>
+      </div>
     </div>
 
+    <!-- Table -->
     <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Account Number</th>
-            <th>Customer</th>
-            <th>Type</th>
-            <th>Balance</th>
-            <th>Open Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="accountsTable">
-          <tr><td colspan="7" class="loading">Loading...</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll">
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Account Number</th>
+              <th>Customer</th>
+              <th>Type</th>
+              <th>Balance</th>
+              <th>Open Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="accountsTable">
+            <tr>
+              <td colspan="7" class="loading">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
     </div>
+
   </div>
 
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Sidebar Helpers -->
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeSidebar();
+    });
+
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + type;
+
+      setTimeout(() => {
+        t.className = 'toast';
+      }, 3000);
+    };
+  </script>
+
+  <!-- Data -->
   <script type="module">
     import { getAccounts } from '../js/api.js';
 
     async function loadAccounts() {
-      const res = await getAccounts();
-      const tbody = document.getElementById('accountsTable');
+      try {
+        const res = await getAccounts();
+        const tbody = document.getElementById('accountsTable');
 
-      if (!res.data || res.data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="loading">No accounts found</td></tr>`;
-        return;
+        if (!res.data || res.data.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="loading">
+                No accounts found
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = res.data.map(a => `
+          <tr>
+            <td>${a.account_id}</td>
+            <td>${a.account_number}</td>
+            <td>${a.first_name} ${a.last_name}</td>
+            <td>${a.account_type}</td>
+            <td>PKR ${Number(a.balance).toLocaleString()}</td>
+            <td>${new Date(a.open_date).toLocaleDateString()}</td>
+            <td>
+              <span class="badge ${a.status.toLowerCase()}">
+                ${a.status}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+
+      } catch (err) {
+        console.error(err);
+
+        document.getElementById('accountsTable').innerHTML = `
+          <tr>
+            <td colspan="7" class="loading">
+              Failed to load accounts
+            </td>
+          </tr>
+        `;
+
+        showToast('Failed to load accounts', 'error');
       }
-
-      tbody.innerHTML = res.data.map(a => `
-        <tr>
-          <td>${a.account_id}</td>
-          <td>${a.account_number}</td>
-          <td>${a.first_name} ${a.last_name}</td>
-          <td>${a.account_type}</td>
-          <td>PKR ${Number(a.balance).toLocaleString()}</td>
-          <td>${new Date(a.open_date).toLocaleDateString()}</td>
-          <td><span class="badge ${a.status.toLowerCase()}">${a.status}</span></td>
-        </tr>
-      `).join('');
     }
 
     loadAccounts();

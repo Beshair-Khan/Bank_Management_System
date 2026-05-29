@@ -4,52 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bank Management System</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- Navbar -->
- <div class="sidebar">
-  <div class="logo">🏦 <span>SMIU BankMS</span></div>
+  <!-- SIDEBAR OVERLAY (mobile backdrop) -->
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <a href="index.html" class="active">Dashboard</a>
-  <a href="customers.html">Customers</a>
-  <a href="accounts.html">Accounts</a>
-  <a href="transactions.html">Transactions</a>
-  <a href="loans.html">Loans</a>
-  <a href="cards.html">Cards</a>
-</div>
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="logo">
+      <span>SMIU BankMS</span>
+      <button class="sidebar-close" onclick="closeSidebar()" aria-label="Close menu">&#x2715;</button>
+    </div>
 
+    <span class="nav-label">Main</span>
+    <a href="index.html" class="active">&nbsp; Dashboard</a>
+    <a href="customers.html">&nbsp; Customers</a>
+    <a href="accounts.html">&nbsp; Accounts</a>
+    <a href="transactions.html">&nbsp; Transactions</a>
+
+    <span class="nav-label">Services</span>
+    <a href="loans.html">&nbsp; Loans</a>
+    <a href="cards.html">&nbsp; Cards</a>
+  </nav>
+
+  <!-- TOPBAR (mobile only — hidden on desktop) -->
+  <header class="topbar">
+    <button class="hamburger" onclick="openSidebar()" aria-label="Open menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <div class="topbar-title"> <span>SMIU BankMS</span></div>
+    <div class="topbar-actions">
+      <div class="topbar-icon" title="Notifications"></div>
+      <div class="topbar-icon" title="Profile"></div>
+    </div>
+  </header>
+
+  <!--  MAIN CONTENT -->
   <div class="container">
-    <div class="page-title">Dashboard Overview</div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard Overview</div>
+        <p class="page-subtitle">Real-time summary of your bank operations</p>
+      </div>
+    </div>
 
     <!-- Stat Cards -->
     <div class="stats-grid">
-      <div class="stat-card blue">
+      <div class="stat-card">
         <div class="label">Total Customers</div>
-        <div class="value" id="totalCustomers">...</div>
+        <div class="value" id="totalCustomers">…</div>
         <div class="sub">Registered customers</div>
       </div>
-      <div class="stat-card green">
+      <div class="stat-card">
         <div class="label">Total Accounts</div>
-        <div class="value" id="totalAccounts">...</div>
+        <div class="value" id="totalAccounts">…</div>
         <div class="sub">Active bank accounts</div>
       </div>
-      <div class="stat-card orange">
+      <div class="stat-card">
         <div class="label">Active Loans</div>
-        <div class="value" id="totalLoans">...</div>
+        <div class="value" id="totalLoans">…</div>
         <div class="sub">Loans in progress</div>
       </div>
-      <div class="stat-card purple">
+      <div class="stat-card">
         <div class="label">Transactions</div>
-        <div class="value" id="totalTransactions">...</div>
+        <div class="value" id="totalTransactions">…</div>
         <div class="sub">Total recorded</div>
       </div>
     </div>
 
-    <!-- Charts -->
+    <!--Charts Row 1 -->
     <div class="charts-grid">
       <div class="chart-card">
         <h3>Transactions by Type</h3>
@@ -61,6 +92,7 @@
       </div>
     </div>
 
+    <!--Charts Row 2 -->
     <div class="charts-grid">
       <div class="chart-card">
         <h3>Loan Status Breakdown</h3>
@@ -75,25 +107,67 @@
     <!-- Recent Transactions Table -->
     <div class="table-card">
       <h3>Recent Transactions</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Ref No</th>
-            <th>Account</th>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Date</th>
-            <th>Balance After</th>
-          </tr>
-        </thead>
-        <tbody id="transactionsTable">
-          <tr><td colspan="6" class="loading">Loading...</td></tr>
-        </tbody>
-      </table>
+
+      <!-- Scroll wrapper = horizontal swipe on mobile -->
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Ref No</th>
+              <th>Account</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Balance After</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTable">
+            <tr><td colspan="6" class="loading">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-  </div>
+  </div><!-- /container -->
 
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- SCRIPTS -->
+
+  <!-- Sidebar open / close -->
+  <script>
+    function openSidebar() {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('overlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    // Close on Escape key
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeSidebar();
+    });
+    // Close sidebar when a nav link is tapped on mobile
+    document.querySelectorAll('.sidebar a').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.innerWidth <= 680) closeSidebar();
+      });
+    });
+
+    // Toast helper (available to module below via window)
+    window.showToast = function(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show ' + type;
+      setTimeout(() => { t.className = 'toast'; }, 3000);
+    };
+  </script>
+
+  <!-- Data + Charts (your original logic, untouched) -->
   <script type="module">
     import {
       getCustomers,
@@ -102,66 +176,75 @@
       getLoans
     } from '../js/api.js';
 
-    // ── Load Stat Cards ──
+    const RED_PALETTE = [
+      '#c1121f', '#d62828', '#e5383b',
+      '#ef233c', '#ff758f', '#ffb3c1'
+    ];
+
+    //  Load Stat Cards 
     async function loadStats() {
-      const [customers, accounts, loans, transactions] = await Promise.all([
-        getCustomers(),
-        getAccounts(),
-        getLoans(),
-        getTransactions()
-      ]);
+      try {
+        const [customers, accounts, loans, transactions] = await Promise.all([
+          getCustomers(),
+          getAccounts(),
+          getLoans(),
+          getTransactions()
+        ]);
 
-      document.getElementById('totalCustomers').textContent    = customers.count;
-      document.getElementById('totalAccounts').textContent     = accounts.count;
-      document.getElementById('totalLoans').textContent        = loans.count;
-      document.getElementById('totalTransactions').textContent = transactions.count;
+        document.getElementById('totalCustomers').textContent    = customers.count;
+        document.getElementById('totalAccounts').textContent     = accounts.count;
+        document.getElementById('totalLoans').textContent        = loans.count;
+        document.getElementById('totalTransactions').textContent = transactions.count;
 
-      loadTransactionsChart(transactions.data);
-      loadAccountsChart(accounts.data);
-      loadLoansChart(loans.data);
-      loadCitiesChart(customers.data);
-      loadRecentTransactions(transactions.data);
+        loadTransactionsChart(transactions.data);
+        loadAccountsChart(accounts.data);
+        loadLoansChart(loans.data);
+        loadCitiesChart(customers.data);
+        loadRecentTransactions(transactions.data);
+
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+        window.showToast('Failed to load data. Check your API.', 'error');
+        ['totalCustomers','totalAccounts','totalLoans','totalTransactions']
+          .forEach(id => { document.getElementById(id).textContent = '—'; });
+        document.getElementById('transactionsTable').innerHTML =
+          `<tr><td colspan="6" class="loading">Could not load transactions.</td></tr>`;
+      }
     }
 
-    // ── Chart 1: Transactions by Type (Bar) ──
+    // shared chart defaults
+    const chartDefaults = {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: { legend: { labels: { font: { family: 'Poppins', size: 12 } } } },
+      scales: { y: { beginAtZero: true, ticks: { font: { family: 'Poppins', size: 11 } } },
+                x: { ticks: { font: { family: 'Poppins', size: 11 } } } }
+    };
+
+    // Chart 1: Transactions by Type (Bar) 
     function loadTransactionsChart(data) {
       const counts = {};
-      data.forEach(t => {
-        counts[t.type_name] = (counts[t.type_name] || 0) + 1;
-      });
+      data.forEach(t => { counts[t.type_name] = (counts[t.type_name] || 0) + 1; });
 
       new Chart(document.getElementById('transactionsChart'), {
         type: 'bar',
         data: {
           labels: Object.keys(counts),
           datasets: [{
-            label: 'Number of Transactions',
+            label: 'Transactions',
             data: Object.values(counts),
-            backgroundColor: [
- '#c1121f',
- '#d62828',
- '#e5383b',
- '#ef233c',
- '#ff758f',
- '#ffb3c1'
-],
+            backgroundColor: RED_PALETTE,
             borderRadius: 6
           }]
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } }
-        }
+        options: { ...chartDefaults, plugins: { legend: { display: false } } }
       });
     }
 
-    // ── Chart 2: Account Types (Doughnut) ──
+    // Chart 2: Account Types (Doughnut) 
     function loadAccountsChart(data) {
       const counts = {};
-      data.forEach(a => {
-        counts[a.account_type] = (counts[a.account_type] || 0) + 1;
-      });
+      data.forEach(a => { counts[a.account_type] = (counts[a.account_type] || 0) + 1; });
 
       new Chart(document.getElementById('accountsChart'), {
         type: 'doughnut',
@@ -169,30 +252,23 @@
           labels: Object.keys(counts),
           datasets: [{
             data: Object.values(counts),
-            backgroundColor: [
- '#c1121f',
- '#d62828',
- '#e5383b',
- '#ef233c',
- '#ff758f',
- '#ffb3c1'
-],
+            backgroundColor: RED_PALETTE,
             borderWidth: 2
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom' } }
+          maintainAspectRatio: true,
+          plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 12 } } } },
+          cutout: '60%'
         }
       });
     }
 
-    // ── Chart 3: Loan Status (Pie) ──
+    // Chart 3: Loan Status (Pie) 
     function loadLoansChart(data) {
       const counts = {};
-      data.forEach(l => {
-        counts[l.status] = (counts[l.status] || 0) + 1;
-      });
+      data.forEach(l => { counts[l.status] = (counts[l.status] || 0) + 1; });
 
       new Chart(document.getElementById('loansChart'), {
         type: 'pie',
@@ -200,30 +276,22 @@
           labels: Object.keys(counts),
           datasets: [{
             data: Object.values(counts),
-            backgroundColor: [
- '#c1121f',
- '#d62828',
- '#e5383b',
- '#ef233c',
- '#ff758f',
- '#ffb3c1'
-],
+            backgroundColor: RED_PALETTE,
             borderWidth: 2
           }]
         },
         options: {
           responsive: true,
-          plugins: { legend: { position: 'bottom' } }
+          maintainAspectRatio: true,
+          plugins: { legend: { position: 'bottom', labels: { font: { family: 'Poppins', size: 12 } } } }
         }
       });
     }
 
-    // ── Chart 4: Customers by City (Bar) ──
+    // Chart 4: Customers by City (Bar) 
     function loadCitiesChart(data) {
       const counts = {};
-      data.forEach(c => {
-        counts[c.city] = (counts[c.city] || 0) + 1;
-      });
+      data.forEach(c => { counts[c.city] = (counts[c.city] || 0) + 1; });
 
       new Chart(document.getElementById('citiesChart'), {
         type: 'bar',
@@ -232,26 +300,15 @@
           datasets: [{
             label: 'Customers',
             data: Object.values(counts),
-            backgroundColor: [
- '#c1121f',
- '#d62828',
- '#e5383b',
- '#ef233c',
- '#ff758f',
- '#ffb3c1'
-],
+            backgroundColor: RED_PALETTE,
             borderRadius: 6
           }]
         },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } }
-        }
+        options: { ...chartDefaults, plugins: { legend: { display: false } } }
       });
     }
 
-    // ── Recent Transactions Table ──
+    //  Recent Transactions Table 
     function loadRecentTransactions(data) {
       const tbody = document.getElementById('transactionsTable');
       const recent = data.slice(0, 8);
@@ -273,7 +330,7 @@
       `).join('');
     }
 
-    // ── Run everything ──
+    //  Run ──
     loadStats();
   </script>
 

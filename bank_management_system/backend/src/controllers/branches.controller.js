@@ -4,7 +4,7 @@ const pool = require('../config/db');
 const getAllBranches = async (req, res, next) => {
   try {
     const result = await pool.query(
-      `SELECT * FROM branches ORDER BY branch_id`
+      `SELECT * FROM branches`
     );
     res.json({ success: true, count: result.rows.length, data: result.rows });
   } catch (err) {

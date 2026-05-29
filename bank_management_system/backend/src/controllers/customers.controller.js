@@ -4,29 +4,13 @@ const pool = require('../config/db');
 const getAllCustomers = async (req, res, next) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM customers'
+      'SELECT * FROM customers ORDER BY customer_id ASC'
     );
     res.json({
       success: true,
       count: result.rows.length,
       data: result.rows
     });
-  } catch (err) {
-    next(err);
-  }
-};
-
-// GET single customer by ID
-const getCustomerById = async (req, res, next) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM customers WHERE customer_id = $1',
-      [req.params.id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Customer not found' });
-    }
-    res.json({ success: true, data: result.rows[0] });
   } catch (err) {
     next(err);
   }
@@ -84,7 +68,6 @@ const deleteCustomer = async (req, res, next) => {
 
 module.exports = {
   getAllCustomers,
-  getCustomerById,
   createCustomer,
   updateCustomer,
   deleteCustomer
